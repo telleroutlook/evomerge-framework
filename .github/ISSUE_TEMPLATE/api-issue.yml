@@ -1,0 +1,48 @@
+name: API behaviour issue
+description: A function in eval_trust/ behaves unexpectedly or crashes on valid input.
+title: "[api] "
+labels: ["bug"]
+body:
+  - type: input
+    id: function
+    attributes:
+      label: Which function?
+      placeholder: eval_trust.paired_stats.mcnemar_exact
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproducer
+    attributes:
+      label: Minimal reproducer
+      description: |
+        A self-contained Python snippet that reproduces the issue.
+      render: python
+      placeholder: |
+        from eval_trust.paired_stats import mcnemar_exact
+        p = mcnemar_exact(0, 0)
+        # Expected: 1.0 (no signal). Got: ZeroDivisionError.
+    validations:
+      required: true
+
+  - type: input
+    id: expected
+    attributes:
+      label: Expected behaviour
+      placeholder: Returns 1.0 (no discordant pairs ⇒ no evidence of difference)
+    validations:
+      required: true
+
+  - type: input
+    id: actual
+    attributes:
+      label: Actual behaviour
+      placeholder: Raises ZeroDivisionError
+    validations:
+      required: true
+
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      render: shell

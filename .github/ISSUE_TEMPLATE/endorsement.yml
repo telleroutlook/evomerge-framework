@@ -1,0 +1,36 @@
+name: Endorsement / collaboration
+description: You'd like to endorse our arxiv submission, or propose a collaboration.
+title: "[endorse] "
+labels: ["endorsement"]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What's this about?
+      options:
+        - I can endorse for arXiv cs.AI / cs.CL / cs.LG / stat.ME
+        - I'd like to collaborate on a follow-up paper
+        - I have a related dataset / case study
+        - I'd like to upstream something to lm-eval-harness based on this work
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: |
+        For endorsement: please mention which arxiv class you're endorsed
+        in. We'll DM you the endorsement code.
+        For collaboration / data / upstream: brief description.
+    validations:
+      required: true
+
+  - type: input
+    id: contact
+    attributes:
+      label: Best way to reach you
+      placeholder: GitHub @handle, Bluesky @handle, or email
+    validations:
+      required: false

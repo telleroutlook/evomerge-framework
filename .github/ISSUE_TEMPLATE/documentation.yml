@@ -1,0 +1,37 @@
+name: Documentation issue
+description: An error or unclear passage in README, EXAMPLES, or the paper.
+title: "[docs] "
+labels: ["documentation"]
+body:
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where?
+      multiple: false
+      options:
+        - README.md
+        - EXAMPLES.md
+        - papers/eval_trust/draft.pdf (or .md)
+        - CONTRIBUTING.md
+        - CITATION.cff
+        - eval_trust/* docstring
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: locator
+    attributes:
+      label: Specific section / line / page
+      placeholder: EXAMPLES.md Recipe 4, line "12.5 pp"
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue
+    attributes:
+      label: What's wrong / unclear?
+      description: |
+        If you have a fix in mind, paste it here as well — saves a round-trip.
+    validations:
+      required: true

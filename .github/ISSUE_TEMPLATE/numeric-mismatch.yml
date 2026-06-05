@@ -1,0 +1,60 @@
+name: Numeric mismatch
+description: A computation in this repo produces numbers that disagree with the paper.
+title: "[numeric] "
+labels: ["numeric-mismatch", "high-priority"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for catching this. Numeric reproducibility is a
+        first-class property of this repo. Please give us enough
+        information to diff our run vs yours.
+
+  - type: input
+    id: which_number
+    attributes:
+      label: Which number disagrees?
+      description: |
+        Quote the paper or the README claim, and the value you get.
+      placeholder: |
+        Paper sec 3.4 says paired McNemar p = 0.8939 (n=199, b=29, c=27).
+        Running run_audit.py I get p = 0.8501 (n=198, b=29, c=27).
+    validations:
+      required: true
+
+  - type: input
+    id: command
+    attributes:
+      label: Command you ran
+      placeholder: PYTHONPATH=. python run_audit.py
+    validations:
+      required: true
+
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: |
+        Output of `python -V`, `pip show numpy scipy`, OS.
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: full_output
+    attributes:
+      label: Full output
+      description: Paste the entire output of the command above.
+      render: text
+
+  - type: checkboxes
+    id: pre
+    attributes:
+      label: Pre-flight
+      options:
+        - label: I cloned a fresh checkout (no local modifications).
+          required: true
+        - label: I ran `pip install -e ".[dev]"` immediately before this.
+          required: true
+        - label: I checked `data/` files have the same SHA256 as upstream.
+          required: false
