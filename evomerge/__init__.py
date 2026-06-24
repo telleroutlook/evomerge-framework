@@ -41,6 +41,26 @@ from evomerge.schemas import (
     SftTrainingRecord,
     TaskSpec,
 )
+from evomerge.eval import (
+    EvalConfig,
+    EvalGroup,
+    EvalHarness,
+    EvalMetrics,
+    EvalRecord,
+    EvalReport,
+    SignificanceReport,
+    compare_all_groups,
+    compute_metrics,
+    paired_significance,
+)
+from evomerge.router import (
+    RouterFeatures,
+    RouterLabel,
+    RouterRecord,
+    RouterRuleClassifier,
+    feature_from_record,
+    label_from_record,
+)
 
 __all__ = [
     # export
@@ -64,4 +84,22 @@ __all__ = [
     "RolloutBranchRecord",
     "SftTrainingRecord",
     "TaskSpec",
+    # eval
+    "EvalConfig",
+    "EvalGroup",
+    "EvalHarness",
+    "EvalMetrics",
+    "EvalRecord",
+    "EvalReport",
+    "SignificanceReport",
+    "compare_all_groups",
+    "compute_metrics",
+    "paired_significance",
+    # router
+    "RouterFeatures",
+    "RouterLabel",
+    "RouterRecord",
+    "RouterRuleClassifier",
+    "feature_from_record",
+    "label_from_record",
 ]

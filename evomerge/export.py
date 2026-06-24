@@ -26,6 +26,7 @@ from evomerge.io import (
     write_jsonl,
 )
 from evomerge.pipeline import (
+    compliance_to_dpo_records,
     compliance_to_sft_records,
     to_dpo_records,
     to_ppo_records,
@@ -41,6 +42,7 @@ class ExportManifest:
     n_dpo: int = 0
     n_ppo: int = 0
     n_compliance_sft: int = 0
+    n_compliance_dpo: int = 0
     n_router: int = 0
     n_invalid: int = 0
     n_contaminated: int = 0
@@ -53,6 +55,7 @@ class ExportManifest:
             "n_dpo": self.n_dpo,
             "n_ppo": self.n_ppo,
             "n_compliance_sft": self.n_compliance_sft,
+            "n_compliance_dpo": self.n_compliance_dpo,
             "n_router": self.n_router,
             "n_invalid": self.n_invalid,
             "n_contaminated": self.n_contaminated,
@@ -150,6 +153,14 @@ def run_export(
         write_jsonl(compliance_sft, p)
         manifest.n_compliance_sft = len(compliance_sft)
         manifest.files["compliance_sft"] = str(p)
+
+    # --- compliance DPO pairs ---
+    compliance_dpo = compliance_to_dpo_records(compliance)
+    if compliance_dpo:
+        p = out / "compliance_dpo.jsonl"
+        write_jsonl(compliance_dpo, p)
+        manifest.n_compliance_dpo = len(compliance_dpo)
+        manifest.files["compliance_dpo"] = str(p)
 
     # --- router records ---
     if task_specs and eval_records:
