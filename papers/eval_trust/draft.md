@@ -81,7 +81,7 @@ This paper provides three pieces of evidence and one toolkit:
 4. **`eval_trust`**, an Apache-2.0 Python toolkit packaging the audit
    heuristics, paired statistics (McNemar exact, Wilson CI, paired bootstrap),
    conformal CI, and a checkpoint/resume experiment runner. Roughly 1200 lines
-   of code with 39 unit tests covering the toolkit's modules. Designed to sit
+   of code with 53 unit tests covering the toolkit's modules. Designed to sit
    *next to* lm-eval-harness [@lmeval2023], not replace it.
 
 ## 1.2 Concrete propositions
@@ -124,9 +124,9 @@ $63\%$ — a 63-pp swing attributable purely to the granularity choice
 - **C3 (`eval_trust` toolkit, \S6).** Apache-2.0 Python package implementing
   the T0v2 protocol of C2 alongside paired statistics (McNemar exact, Wilson
   CI, paired bootstrap), conformal CI, and a checkpoint/resume experiment
-  runner. The toolkit ships with 39 unit tests covering its own modules; the
-  remainder of our project's 1102-test suite covers application code and is
-  not part of the toolkit.
+  runner. The toolkit ships with 53 unit tests covering its own modules; the
+  remainder of our project's 288-test suite covers the evomerge data-pipeline
+  and compliance training infrastructure and is not part of the toolkit.
 - **C4 (audit checklist, Appendix A).** A 10-item yes/no checklist any merging
   paper draft should pass before claiming a delta below 10 pp.
 
@@ -740,11 +740,11 @@ audit must run on whatever hardware reproduces the original evaluation).
 | `t0v2.aggregator` | Channel aggregation + $\alpha$/$\beta$/$\gamma$ routing (\S4.3) | ~80 | 3 |
 | `t0v2.self_consistency` | SC-$k$ majority vote on greedy-wrong items, with lottery-rate report | ~150 | 5 |
 
-The full project test suite at the time of submission has 1102 passing tests
-across 93 files; `eval_trust` accounts for 39 of them (the count claimed in
-\S1.3). The remaining ~1063 tests cover domain-specific compression, merging,
-and orchestration code that is *not* part of the toolkit and is not released
-under the toolkit's Apache-2.0 license.
+The full project test suite at the time of submission has 288 passing tests
+across files; `eval_trust` accounts for 53 of them (the count claimed in
+\S1.3). The remaining 235 tests cover the evomerge data-pipeline and
+compliance training infrastructure that is *not* part of the toolkit and is
+not released under the toolkit's Apache-2.0 license.
 
 ## 6.2 Implementation notes
 

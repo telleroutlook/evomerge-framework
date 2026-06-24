@@ -1,14 +1,24 @@
-# eval_trust
+# eval_trust · evomerge-framework
 
 [![CI](https://github.com/telleroutlook/evomerge-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/telleroutlook/evomerge-framework/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org)
 [![Paper PDF](https://img.shields.io/badge/paper-PDF-red.svg)](papers/eval_trust/draft.pdf)
 
-**Audit your LLM benchmark numbers before someone else does.**
+**The research and data layer behind WasmAgent: auditing evaluation claims and converting verified runtime traces into training records.**
 
-Companion code & data for the paper *"Silent Contamination in LLM Merging
-Evaluation: A Case Study from a 5-Month Misadventure."*
+This repository contains two things that form a single trustworthy agent training loop:
+
+1. **`eval_trust`** — empirical evaluation audit toolkit for LLM benchmark claims (*"Silent Contamination in LLM Merging Evaluation"*)
+2. **`evomerge`** — compliance trace-to-training data factory (SFT / DPO / PPO / router records from `ComplianceEvalRecord`)
+
+```
+Stage 1 — Trust the evaluation      Stage 2 — Train from trusted traces
+─────────────────────────────       ──────────────────────────────────
+eval_trust: expose contaminated  →  evomerge: convert verified agent
+benchmark claims before they        failures into SFT/DPO/router
+reach the literature                training data
+```
 
 ---
 
@@ -76,20 +86,22 @@ That's the entire case study, on real data, in one screenful.
 
 ## What's in the toolkit
 
-📖 **[EXAMPLES.md](EXAMPLES.md)** — 10 copy-pasteable recipes.
-🐍 **[`examples/`](examples/)** — same 10 as standalone runnable .py.
-🛠️ **[`Makefile`](Makefile)** — 14 dev shortcuts (`make help`).
+📖 **[EXAMPLES.md](EXAMPLES.md)** — 16 copy-pasteable recipes (10 eval_trust + 6 evomerge pipeline).
+🐍 **[`examples/`](examples/)** — same 16 as standalone runnable .py.
+🛠️ **[`Makefile`](Makefile)** — dev shortcuts (`make help`).
 🧪 **[`benchmarks/`](benchmarks/)** — synthetic ground-truth self-test.
 📄 **[`papers/eval_trust/`](papers/eval_trust/)** — paper PDF + LaTeX + figures + scripts.
+📄 **[`papers/compliance_model/`](papers/compliance_model/)** — compliance training report + schema novelty analysis.
 
 ```
-eval_trust/  paired_stats / conformal_ci / lm_eval_bridge / t0v2/
-data/        case-study logs + synthetic + quantization summary
-tests/       41 unit tests (paired_stats / conformal_ci / lm_eval_bridge)
+eval_trust/   paired_stats / conformal_ci / lm_eval_bridge / t0v2/
+evomerge/     schemas / pipeline / eval / router / synthesize / export
+data/         case-study logs + synthetic + quantization summary
+tests/        288 tests (53 eval_trust + 235 evomerge pipeline)
 ```
 
-Pure Python + NumPy + (optional) SciPy. **No GPU dependency. No model
-inference.** All audits run on your existing log files.
+**eval_trust**: Pure Python + NumPy + (optional) SciPy. No GPU. No model inference.
+**evomerge**: Pydantic v2 + scikit-learn (optional). Converts compliance traces to training data.
 
 ---
 
