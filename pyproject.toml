@@ -29,6 +29,9 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.5", "scipy>=1.11", "sympy>=1.12"]
 
+[project.scripts]
+evomerge = "evomerge.__main__:main"
+
 [project.urls]
 Homepage = "https://github.com/telleroutlook/evomerge-framework"
 Paper = "https://github.com/telleroutlook/evomerge-framework/blob/main/papers/eval_trust/draft.pdf"

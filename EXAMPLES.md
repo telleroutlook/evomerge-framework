@@ -301,3 +301,175 @@ print(f"n={out['n_common']}  delta={out['delta_pp']:+.1f}pp  p={p:.4f}")
 counts. Pass them to `mcnemar_exact` and you have the standard
 exchange of "is this delta real?" — same workflow as Recipe 1, but
 sourced from lm-eval-harness rather than custom logs.
+
+---
+
+## WasmAgent pipeline recipes
+
+The following recipes use the `evomerge` package (WasmAgent trace-to-training
+pipeline). Install with `pip install -e ".[dev]"`.
+
+---
+
+## Recipe 11: rollout traces → SFT training records
+
+```python
+from evomerge.io import load_rollouts, write_jsonl
+from evomerge.pipeline.sft import to_sft_records
+from evomerge.validate.schema_check import validate_training_record
+
+branches = load_rollouts("fixtures/data-loop/rollout-branches.v1.jsonl")
+sft = to_sft_records(branches, only_passing=True)  # only objective_score=1
+
+for r in sft:
+    assert validate_training_record(r).ok
+
+write_jsonl(sft, "data/training/sft.jsonl")
+print(f"{len(sft)} SFT records → data/training/sft.jsonl")
+```
+
+See also: [`examples/recipe11_rollout_to_sft.py`](examples/recipe11_rollout_to_sft.py)
+
+---
+
+## Recipe 12: rollout traces → DPO preference pairs
+
+```python
+from evomerge.io import load_rollouts
+from evomerge.pipeline.dpo import to_dpo_records
+from evomerge.validate.contamination import check_contamination
+
+branches = load_rollouts("fixtures/data-loop/rollout-branches.v1.jsonl")
+dpo = to_dpo_records(branches)
+
+# Guard against eval-set contamination before exporting
+report = check_contamination(
+    training_texts=[r.chosen for r in dpo],
+    eval_texts=["...your eval item texts..."],
+    threshold=0.2,
+)
+print(f"contamination: {report.n_flagged}/{report.n_training} flagged")
+assert report.n_flagged == 0
+```
+
+See also: [`examples/recipe12_rollout_to_dpo.py`](examples/recipe12_rollout_to_dpo.py)
+
+---
+
+## Recipe 13: ComplianceEvalRecord → answerer + repairer SFT
+
+```python
+from evomerge.schemas.compliance import (
+    ComplianceEvalRecord, ConstraintViolation, ConstraintLevel,
+    ConstraintCategory, RepairTraceEntry, RepairStrategy, RunMode, ViolationStage,
+)
+from evomerge.pipeline.compliance_sft import compliance_to_sft_records
+
+record = ComplianceEvalRecord(
+    task_id="rfi-001", task_spec_hash="abc123", model="qwen-7b",
+    mode=RunMode.full_pcl, final_pass=True,
+    artifact="Summary...\nAction List\n- Review by Friday",
+    violations=[ConstraintViolation(
+        constraint_id="c_action_list", level=ConstraintLevel.hard,
+        category=ConstraintCategory.content,
+        hint="Missing 'Action List' section",
+        detected_at=ViolationStage.post_decode,
+    )],
+    repair_trace=[RepairTraceEntry(
+        round=1, violation_ids=["c_action_list"],
+        strategy=RepairStrategy.insert_section, ok=True,
+    )],
+    repair_rounds=1,
+)
+
+sft = compliance_to_sft_records([record])
+print([r.output_type for r in sft])
+# ['final_answer', 'repair_patch']
+```
+
+See also: [`examples/recipe13_compliance_sft.py`](examples/recipe13_compliance_sft.py)
+
+---
+
+## Recipe 14: A/B/C/D/E evaluation harness
+
+```python
+from evomerge.eval import EvalConfig, EvalGroup, EvalHarness, EvalRecord
+
+TASK_IDS = [f"t{i}" for i in range(30)]
+TASKS    = ["Summarise document." for _ in TASK_IDS]
+
+def run_group_A(task_id, task):
+    # replace with real model call
+    i = int(task_id[1:])
+    return EvalRecord(task_id, "A", final_pass=(i % 10 >= 7), latency_ms=300)
+
+def run_group_C(task_id, task):
+    i = int(task_id[1:])
+    return EvalRecord(task_id, "C", final_pass=(i % 10 >= 2), latency_ms=420)
+
+report = EvalHarness(
+    EvalConfig(TASK_IDS, TASKS),
+    {"A": EvalGroup("A", run_group_A), "C": EvalGroup("C", run_group_C)},
+).run()
+
+for g, m in report.metrics.items():
+    print(f"{g}: pass={m.taskspec_pass_rate:.0%}  cost={m.cost_per_accepted_task:.0f} tok")
+```
+
+See also: [`examples/recipe14_eval_harness.py`](examples/recipe14_eval_harness.py)
+
+---
+
+## Recipe 15: prove C > A with McNemar + bootstrap
+
+```python
+from evomerge.eval import EvalRecord, paired_significance
+
+group_A = [EvalRecord(f"t{i}", "A", i % 10 >= 7) for i in range(30)]
+group_C = [EvalRecord(f"t{i}", "C", i % 10 >= 2) for i in range(30)]
+
+r = paired_significance(group_A, group_C, label_a="A (base)", label_b="C (fine-tuned)")
+print(f"delta={r.pass_rate_delta:+.1%}  p={r.mcnemar_p:.4f}  sig@05={r.significant_at_05}")
+# delta=+50.0%  p=0.0000  sig@05=True
+```
+
+See also: [`examples/recipe15_significance.py`](examples/recipe15_significance.py)
+
+---
+
+## Recipe 16: full-loop demo (export → eval → significance → router)
+
+```python
+from evomerge.export import run_export
+from evomerge.eval import EvalConfig, EvalGroup, EvalHarness, EvalRecord, paired_significance
+from evomerge.router.classifier import RouterRuleClassifier
+from evomerge.router.features import feature_from_record
+from evomerge.synthesize.templates import TaskType, make_task_spec
+import tempfile
+
+# 1. export
+with tempfile.TemporaryDirectory() as out:
+    manifest = run_export(
+        rollout_jsonl="fixtures/data-loop/rollout-branches.v1.jsonl",
+        out_dir=out,
+    )
+    print(f"n_sft={manifest.n_sft}  n_dpo={manifest.n_dpo}  n_ppo={manifest.n_ppo}")
+
+# 2. eval + significance (deterministic stubs)
+ids = [f"t{i}" for i in range(40)]
+A = [EvalRecord(t, "A", int(t[1:]) % 10 >= 7) for t in ids]
+C = [EvalRecord(t, "C", int(t[1:]) % 10 >= 2) for t in ids]
+sig = paired_significance(A, C)
+print(f"p={sig.mcnemar_p:.4f}  significant={sig.significant_at_05}")
+
+# 3. router
+spec = make_task_spec(TaskType.markdown_report, intent="Summarise")
+clf  = RouterRuleClassifier()
+labels = [clf.predict(feature_from_record(spec, r)).value for r in C]
+from collections import Counter
+print(Counter(labels))
+```
+
+See also: [`examples/recipe16_full_loop_demo.py`](examples/recipe16_full_loop_demo.py)
+
