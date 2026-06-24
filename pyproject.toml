@@ -3,22 +3,28 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "eval-trust"
-version = "0.1.0"
-description = "Audit your LLM benchmark numbers before someone else does"
+name = "evomerge"
+version = "0.2.0"
+description = "WasmAgent trace-to-training pipeline and LLM benchmark audit toolkit"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
 authors = [{ name = "telleroutlook" }]
-keywords = ["llm", "evaluation", "audit", "mcnemar", "conformal", "reproducibility"]
+keywords = [
+    "llm", "evaluation", "audit", "mcnemar", "conformal", "reproducibility",
+    "sft", "dpo", "ppo", "rlhf", "wasmagent", "compliance", "training-data",
+]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering",
 ]
-dependencies = ["numpy>=1.26"]
+dependencies = [
+    "numpy>=1.26",
+    "pydantic>=2.0",
+]
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.5", "scipy>=1.11", "sympy>=1.12"]
@@ -28,7 +34,7 @@ Homepage = "https://github.com/telleroutlook/evomerge-framework"
 Paper = "https://github.com/telleroutlook/evomerge-framework/blob/main/papers/eval_trust/draft.pdf"
 
 [tool.setuptools.packages.find]
-include = ["eval_trust*"]
+include = ["eval_trust*", "evomerge*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
