@@ -138,9 +138,10 @@ repair. ConstraintIR adds `level`, `category`, `repair` to close the gap.
 
 **Property 2: Locatability** — *ConstraintViolation + EvidenceSpan*
 Verification output must identify *where* in the output the violation occurs,
-not just *whether* it occurs. This property is absent in all verified sources.
-Without it, repair can only be global (full rewrite); with it, repair can be
-local (patch/insert_section targeting `char_range` or `json_pointer`).
+not just *whether* it occurs. To our knowledge, this property is absent in all
+verified sources. Without it, repair can only be global (full rewrite); with
+it, repair can be local (patch/insert_section targeting `char_range` or
+`json_pointer`).
 
 **Property 3: Trainability** — *RepairTraceEntry*
 The path from error to repair must be recorded in a machine-readable form
@@ -148,9 +149,21 @@ suitable for preference data construction. ETO provides trajectory pairs but
 no violation rationale. arXiv:2509.18847 provides a trajectory format but
 not a JSON Schema.
 
-**Any framework satisfying all three properties simultaneously is, to our
-knowledge, novel.** The combination enables a data flywheel that existing
-frameworks cannot:
+To our knowledge, no prior agent-training framework exposes all three
+properties — verifiability, locatability, and trainability — in a single
+open JSON Schema suitable for both audit and preference construction.
+
+### Closest Systems Comparison
+
+| System | Typed task constraints | Localized violation evidence | Typed repair trace | Training pair construction | Runtime audit record |
+|---|:---:|:---:|:---:|:---:|:---:|
+| IFEval | Partial | No | No | No | Partial |
+| FollowBench | Taxonomy only | No | No | No | Partial |
+| Guardrails / Instructor | Output schema | Partial | No | No | Partial |
+| AutoGen | No | No | Free-text/log | No | Partial |
+| ETO | No | No | Trajectory only | Yes | No |
+| Failure Makes the Agent Stronger (arXiv:2509.18847) | No | No | Trajectory format | Yes | Partial |
+| **WasmAgent Compliance** | **Yes** | **Yes** | **Yes** | **Yes** | **Yes** |
 
 ```
 ComplianceEvalRecord (verifiable + locatable + trainable)

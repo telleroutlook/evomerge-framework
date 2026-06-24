@@ -325,6 +325,12 @@
     }
   },
   "properties": {
+    "schema_version": {
+      "const": "compliance-eval-record/v1",
+      "default": "compliance-eval-record/v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
     "task_id": {
       "title": "Task Id",
       "type": "string"

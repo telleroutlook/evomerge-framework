@@ -132,6 +132,7 @@ class ComplianceError(BaseModel):
 
 
 class ComplianceEvalRecord(BaseModel):
+    schema_version: Literal["compliance-eval-record/v1"] = "compliance-eval-record/v1"
     task_id: str
     task_spec_hash: str
     model: str

@@ -256,10 +256,11 @@ unseeded baseline):
 Plus 60 synthetic SFT records from `SyntheticGenerator` (claude-haiku,
 5 task templates × 10 good + 2 bad each).
 
-### 4.3 Router classifier
+### 4.3 After-first-attempt escalation router
 
 A `GradientBoostingClassifier` (200 estimators, max_depth=4,
-min_samples_leaf=5) trained on 300 real `RouterRecord` instances:
+min_samples_leaf=5) trained on 300 real `RouterRecord` instances derived
+from the `direct` mode of the IFEval benchmark runs:
 
 | Metric | Score |
 |---|---|
@@ -267,20 +268,27 @@ min_samples_leaf=5) trained on 300 real `RouterRecord` instances:
 | 5-fold CV F1 macro | **85.9% ± 5.3%** |
 
 Label distribution: `small_model_can_handle` 44.3%, `need_large_model`
-43.3%, `need_repair` 12.3% — near-balanced binary classification with a
-small repair class.
+43.3%, `need_repair` 12.3%.
 
-Top features by importance: `n_hard_violations` (38.5%), `n_violations`
-(30.8%), `prompt_tokens` (14.2%). `model_is_qwen` contributes only 1.0%,
+Top features: `n_hard_violations` (38.5%), `n_violations` (30.8%),
+`prompt_tokens` (14.2%). `model_is_qwen` contributes only 1.0%,
 indicating the router generalizes across model families.
 
-### 4.4 SFT training (in progress)
+**Note:** This is an *after-first-attempt* router that observes `direct`
+mode violation counts. A pre-run router using only static `TaskSpec`
+features (constraint count, category entropy, tool policy) is a planned
+ablation — see Section 3.4.
+
+### 4.4 SFT training (*planned — in progress*)
 
 QLoRA adapter on Qwen2.5-1.5B (LoRA r=16, α=32, fp32+CPU) training on
-616 records (556 real + 60 synthetic). Training in progress at time of
-writing; results to be added upon completion.
+616 records (556 real IFEval + 60 synthetic). Training checkpoint-100/200
+saved at time of writing.
 
-*Pending: group A vs C pass-rate comparison on IFEval held-out set.*
+**Planned comparison (not yet observed):** group A (base model, direct)
+vs group C (fine-tuned + compliance engine) on IFEval held-out set.
+Expected: group C pass rate ≥ group A + 10 pp, McNemar p < 0.05.
+Results to be added upon completion.
 
 ---
 
@@ -357,26 +365,9 @@ under Apache-2.0. Training checkpoints are kept locally.
 7. McNemar (1947), Wilson (1927), Efron (1979): see `eval_trust/paired_stats.py`
 8. eval_trust: telleroutlook, evomerge-framework (2026)
 
-
 ---
 
-## Abstract
-
-We present a post-training approach for adapting open-source small language
-models (1.5B–8B) to operate reliably inside the WasmAgent runtime. Rather
-than training a general-purpose chat model from scratch, we condition an
-existing base model on WasmAgent's structured execution protocol: TaskSpec,
-ToolCallTrace, VerifierFeedback, RepairTrace, and ExecutionEvidence. The
-result is a *compliance-conditioned small model* that outputs well-formed
-tool calls, generates evidence-backed answers, and produces targeted repair
-patches — at a fraction of the cost of prompting a large frontier model.
-
-We define five evaluation groups (A–E), introduce a verifier-driven
-preference data construction method, and report TaskSpec pass rate, tool-call
-validity, repair success rate, and escalation rate across all groups. We show
-that fine-tuning on 3,000–5,000 WasmAgent traces raises pass rate from 30%
-(base, group A) to 80%+ (fine-tuned, group C), with McNemar p < 0.01, while
-retaining general ability within ±1 pp on held-out benchmarks.
+*Archived plan draft removed. See git history for prior version.*
 
 ---
 
@@ -505,16 +496,25 @@ Statistical validation uses McNemar exact test on `(b, c)` pass/fail
 disagreement counts between groups, with 95% Wilson CI per group and
 paired bootstrap for delta confidence intervals (via `eval_trust.paired_stats`).
 
-### 3.4 Router model (Phase 3)
+### 3.4 After-first-attempt escalation router (Phase 3)
 
-A lightweight router predicts the appropriate escalation path before or after
-each small-model attempt. Input: 15-dimensional `RouterFeatures` (TaskSpec
-complexity, tool policy, repair history, latency, token cost). Output:
-`small_model_can_handle | need_repair | need_large_model | need_human_review`.
+After the small model's `direct` attempt, a lightweight router decides
+whether to invoke local repair or escalate to a large model. This is an
+*after-first-attempt* escalation router, not a pre-run complexity predictor:
+it observes deterministic violation features from the completed `direct` run
+and predicts `small_model_can_handle | need_repair | need_large_model`.
 
-The rule-based `RouterRuleClassifier` serves as the baseline. The target ML
-classifier (GBDT or small transformer encoder) is trained on `RouterRecord`
-JSONL exported by `run_export()`.
+Input: 15-dimensional `RouterFeatures` derived from the `direct` record —
+violation counts (total, hard, soft, by category), repair history, token
+costs, latency, and model identity.
+
+The rule-based `RouterRuleClassifier` serves as the baseline. The GBDT ML
+classifier is trained on `RouterRecord` JSONL exported by `run_export()`.
+
+A separate *pre-run* router using only static `TaskSpec` features (number of
+constraints, hard/soft ratio, category entropy, tool policy complexity) is
+left for future work to cleanly separate task-complexity prediction from
+failure-based escalation.
 
 ---
 
