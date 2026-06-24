@@ -32,9 +32,12 @@ sys.path.insert(0, str(REPO_ROOT))
 
 
 def _content_hash(rec: dict) -> str:
+    # Dedup: exact content match only (full last-message hash)
+    # This keeps different-task records and different-seed records
+    # even if they look similar, only dropping true duplicates
     msgs = rec.get("messages", [])
-    last = msgs[-1]["content"] if msgs else ""
-    return hashlib.sha256(last.encode()).hexdigest()[:16]
+    all_content = "|".join(m.get("content", "")[:200] for m in msgs)
+    return hashlib.sha256(all_content.encode()).hexdigest()[:20]
 
 
 def load_jsonl(path: Path) -> list[dict]:

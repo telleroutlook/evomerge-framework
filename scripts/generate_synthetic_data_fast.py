@@ -45,10 +45,20 @@ def _make_client():
 
 
 def _call(client, model: str, max_tokens: int, messages: list[dict]) -> str:
-    resp = client.messages.create(
-        model=model, max_tokens=max_tokens, messages=messages
-    )
-    return resp.content[0].text
+    import time
+    for attempt in range(8):
+        try:
+            resp = client.messages.create(
+                model=model, max_tokens=max_tokens, messages=messages
+            )
+            return resp.content[0].text
+        except Exception as e:
+            if "429" in str(e) or "rate" in str(e).lower():
+                wait = 2 ** attempt
+                time.sleep(wait)
+            else:
+                raise
+    raise RuntimeError("exceeded retry limit on rate-limit errors")
 
 
 def main() -> int:
