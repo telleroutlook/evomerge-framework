@@ -24,6 +24,14 @@ help:  ## Show this help.
 install:  ## Install in editable mode with dev extras.
 	pip install -e ".[dev]"
 
+.PHONY: install-ml
+install-ml:  ## Install ML extras (scikit-learn, joblib).
+	pip install -e ".[dev,ml]"
+
+.PHONY: install-train
+install-train:  ## Install full training stack (peft, trl, transformers, bitsandbytes).
+	pip install -e ".[dev,ml,train]"
+
 # ============================================================================
 # Tests
 # ============================================================================
