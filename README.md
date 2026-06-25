@@ -98,9 +98,9 @@ That's the entire case study, on real data, in one screenful.
 
 ```
 eval_trust/   paired_stats / conformal_ci / lm_eval_bridge / t0v2/
-evomerge/     schemas / pipeline / eval / router / synthesize / export
+evomerge/     schemas / pipeline / adp / rl / capability / context_compile / security / export
 data/         case-study logs + synthetic + quantization summary
-tests/        288 tests (53 eval_trust + 235 evomerge pipeline)
+tests/        379 tests (53 eval_trust + 326 evomerge pipeline)
 ```
 
 **eval_trust**: Pure Python + NumPy + (optional) SciPy. No GPU. No model inference.
@@ -179,7 +179,7 @@ evomerge/
 ├── synthesize/     TaskSpec templates + SyntheticGenerator (teacher model)
 ├── eval/           EvalHarness (A/B/C/D/E groups), EvalMetrics, stat_bridge
 ├── router/         RouterFeatures, RouterLabel, RouterRuleClassifier
-└── __main__.py     CLI: export / router / validate / synthesize
+└── __main__.py     CLI: export / adp-export / rl-export / compile-context / router / validate / synthesize
 ```
 
 ### CLI
@@ -187,9 +187,24 @@ evomerge/
 | Command | What it does |
 |---|---|
 | `python -m evomerge export` | rollout + compliance JSONL → sft/dpo/ppo/router.jsonl |
+| `python -m evomerge adp-export` | rollout-wire/v1 → ADP (Agent Data Protocol) episode JSONL |
+| `python -m evomerge rl-export` | rollout-wire/v1 → RL transition records (build/policy/cost reward) |
+| `python -m evomerge compile-context` | rollout traces → long-context QA or router/critic records |
 | `python -m evomerge validate` | schema + contamination check on any training JSONL |
 | `python -m evomerge router` | batch routing predictions with rule classifier |
 | `python -m evomerge synthesize` | generate synthetic samples via teacher model |
+
+### New modules (since v0.2)
+
+| Module | Location | Purpose |
+|---|---|---|
+| ADP export | `evomerge/adp/export.py` | rollout → Agent Data Protocol episodes |
+| RL transitions | `evomerge/rl/export.py` | rollout → (state, action, reward, done) tuples |
+| Capability taxonomy | `evomerge/capability/taxonomy.py` | 11-tag deterministic step tagger |
+| Capability attribution | `evomerge/capability/attribution.py` | mine failure modes from pass/fail branch pairs |
+| Trace-to-context | `evomerge/context_compile/compiler.py` | long-context QA + router/critic records |
+| MCP security eval | `evomerge/security/mcp.py` | McpSecurityEvalRecord schema for firewall events |
+| Dataset card | `scripts/generate-dataset-card.py` | auto-generate DATASET_CARD.md from manifest.json |
 
 ### Schema contract
 
