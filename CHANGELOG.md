@@ -6,7 +6,39 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased] — 2026-06-25
 
-### Added
+### Added (P0/P1/P2 pipeline modules)
+
+- **`evomerge/adp/export.py`** — ADP (Agent Data Protocol) export. `rollout_to_adp()` converts
+  `RolloutBranchRecord` to interleaved agent/environment step list. CLI: `python -m evomerge adp-export`.
+
+- **`evomerge/rl/export.py`** — RL transition export. `RlTransition` with `RewardSignal`
+  (build / visual / policy / cost dims). CLI: `python -m evomerge rl-export --reward build,policy,cost`.
+
+- **`evomerge/capability/taxonomy.py`** — 11-tag deterministic capability tagger (`CapabilityTag` enum,
+  `tag_rollout_step()`, `tag_adp_episode()`). No ML. Rule tables are monkey-patchable for tests.
+
+- **`evomerge/capability/attribution.py`** — Capability attribution engine. `attribute_rollout()`
+  compares passing vs failing branches, identifies missing capability tags, classifies failure mode.
+  `mine_capability_gaps()` aggregates across rollout lists. Outputs `CapabilityGap` with DPO/SFT suggestion.
+
+- **`evomerge/context_compile/compiler.py`** — Trace-to-context compiler. Two modes:
+  `long_context_qa` (full trace → QA record, passing branches only) and `router_critic`
+  (per-step continue/stop/ask decisions). CLI: `python -m evomerge compile-context`.
+
+- **`evomerge/security/mcp.py`** — `McpSecurityEvalRecord` Pydantic schema (`mcp-security-eval/v1`).
+  Records firewall decision, risk findings, rug-pull detection, consent ref, taint signals.
+
+- **`scripts/generate-dataset-card.py`** — Auto-generate `DATASET_CARD.md` from `manifest.json`.
+  Fills template with record counts, contamination report, seed table, schema refs. `--check` mode for CI.
+
+- **`docs/dataset-card-template.md`** — Standard dataset card template for all JSONL/model outputs.
+
+- **CI**: Added cross-repo schema parity step (sparse-checkout wasmagent-js, runs
+  `sync-wasmagent-schemas --check` + `check-schema-parity --wasmagent-js`). Dataset card smoke test.
+
+- **Test count**: 379 tests (up from 288 at last changelog entry).
+
+### Added (previous entries follow)
 
 - `fixtures/golden/` — 6 golden trace fixtures covering all canonical scenarios:
   `rollout-success`, `rollout-policy-blocked`, `rollout-repair-success`,
