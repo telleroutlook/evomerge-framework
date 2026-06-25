@@ -124,7 +124,9 @@ def main() -> int:
     ap.add_argument("--fp32", action="store_true", default=True,
                     help="force float32 (default: True for 1.5B stability)")
     ap.add_argument("--bf16", action="store_true",
-                    help="use bfloat16 (faster for 4B+)")
+                    help="use bfloat16 (faster for 4B+ on CPU)")
+    ap.add_argument("--force-cpu", action="store_true",
+                    help="force use_cpu=True (Apple Silicon only)")
     ap.add_argument("--save-steps", type=int, default=50)
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
@@ -202,7 +204,7 @@ def main() -> int:
         beta=args.beta,
         max_length=512,
         max_prompt_length=256,
-        use_cpu=True,
+        use_cpu=args.force_cpu,
         bf16=args.bf16 and not args.fp32,
         fp16=False,
         logging_steps=10,

@@ -105,9 +105,11 @@ def main() -> int:
     ap.add_argument("--lora-alpha", type=int, default=32)
     ap.add_argument("--lora-dropout", type=float, default=0.05)
     ap.add_argument("--fp32", action="store_true",
-                    help="force float32 (required for 1.5B to avoid NaN)")
+                    help="force float32 (recommended for 1.5B to avoid NaN)")
     ap.add_argument("--bf16", action="store_true",
-                    help="use bfloat16 (faster for 4B+, use with use_cpu=True)")
+                    help="use bfloat16 (faster for 4B+ on CPU)")
+    ap.add_argument("--force-cpu", action="store_true",
+                    help="force use_cpu=True (Apple Silicon only — avoids MPS degradation)")
     ap.add_argument("--loss-threshold", type=float, default=0.1,
                     help="early stop when training loss falls below this")
     ap.add_argument("--dry-run", action="store_true",
@@ -239,8 +241,9 @@ def main() -> int:
         logging_steps=10,
         save_steps=args.save_steps,
         save_total_limit=3,
-        # Apple Silicon: use_cpu=True mandatory to avoid MPS degradation
-        use_cpu=True,
+        # use_cpu=True only needed on Apple Silicon to avoid MPS wired-memory degradation.
+        # On Linux CPU nodes, omit it — the default device selection is correct.
+        use_cpu=args.force_cpu,
         bf16=args.bf16 and not args.fp32,
         fp16=False,
         max_length=max_seq_len,
@@ -255,13 +258,23 @@ def main() -> int:
         callbacks=[LossThresholdCallback(args.loss_threshold)],
     )
 
+    # Auto-detect latest checkpoint for resume
+    resume_from = None
+    existing_ckpts = sorted(
+        [d for d in out.iterdir() if d.is_dir() and d.name.startswith("checkpoint-")],
+        key=lambda d: int(d.name.split("-")[1])
+    )
+    if existing_ckpts:
+        resume_from = str(existing_ckpts[-1])
+        print(f"\n  resuming from {resume_from}")
+
     print(f"\ntraining...")
     print(f"  max_steps      : {args.max_steps}")
     print(f"  effective_batch: {args.batch_size * args.grad_accum}")
     print(f"  loss_threshold : {args.loss_threshold}")
     print(f"  out_dir        : {out}")
 
-    trainer.train()
+    trainer.train(resume_from_checkpoint=resume_from)
     trainer.save_model(str(out / "final"))
     tokenizer.save_pretrained(str(out / "final"))
 
