@@ -774,7 +774,7 @@ not released under the toolkit's Apache-2.0 license.
 ## 6.4 Reproducibility
 
 The artefacts cited in \S\S3-5 are released under the project repo
-[github.com/telleroutlook/evomerge](https://github.com/telleroutlook/evomerge)
+[github.com/WasmAgent/trace-pipeline](https://github.com/WasmAgent/trace-pipeline)
 under the tag corresponding to this paper's submission. Specifically:
 
 - `phase13_3_coder_chat/` — the original (pre-audit) +10 pp data.
@@ -964,7 +964,7 @@ Failing any item is not a fatal flaw; failing it silently is.
 
 | Component | Detail |
 |---|---|
-| **Code** | github.com/telleroutlook/evomerge (tag accompanying this submission) |
+| **Code** | github.com/WasmAgent/trace-pipeline (tag accompanying this submission) |
 | **Toolkit** | `framework/eval_trust/` (released alongside this paper) |
 | **Data — case study** | `phase13_3_coder_chat/`, `phase14_t0v2_a_recovery/`, `phase14_t0v2_d/`, `phase14_t7_pareto/`, `phase14_t7_v4_group/`, `phase14_t7_marginal_protect/` |
 | **Data — provenance** | `papers/eval_trust/numbers_cross_check.json` lists every number cited with its source file |

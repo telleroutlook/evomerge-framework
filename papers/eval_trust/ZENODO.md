@@ -10,7 +10,7 @@ Zenodo (CERN-hosted) gives software releases a permanent DOI without
 requiring a journal. Citations look like:
 
 ```
-telleroutlook (2026). trace-pipeline: v0.1.0.
+telleroutlook (2026). WasmAgent/trace-pipeline: v0.1.0.
 Zenodo. https://doi.org/10.5281/zenodo.XXXXXXX
 ```
 
@@ -27,7 +27,7 @@ Useful in three cases:
 ### 1. Sign in to Zenodo via GitHub
 
 Go to <https://zenodo.org/account/settings/github/> and sign in with
-the same GitHub account that owns this repo (`telleroutlook`).
+the WasmAgent organization (managed by `telleroutlook`).
 
 ### 2. Toggle the repository
 
