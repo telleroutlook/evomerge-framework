@@ -1,23 +1,26 @@
-# eval_trust · evomerge-framework
+# evomerge-framework
 
 [![CI](https://github.com/telleroutlook/evomerge-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/telleroutlook/evomerge-framework/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org)
 [![Paper PDF](https://img.shields.io/badge/paper-PDF-red.svg)](papers/eval_trust/draft.pdf)
 
-**The research and data layer behind WasmAgent: auditing evaluation claims and converting verified runtime traces into training records.**
+**Measurement trust and trace-to-training backend for WasmAgent.**
 
-This repository contains two things that form a single trustworthy agent training loop:
+> *evomerge-framework is the research backend that tells you whether your evaluation is trustworthy and whether your runtime traces are safe enough to become training data.*
 
-1. **`eval_trust`** — empirical evaluation audit toolkit for LLM benchmark claims (*"Silent Contamination in LLM Merging Evaluation"*)
-2. **`evomerge`** — compliance trace-to-training data factory (SFT / DPO / PPO / router records from `ComplianceEvalRecord`)
+This repository is the third layer of the [WasmAgent Trustworthy Agent Training Loop](docs/ecosystem-map.md):
 
 ```
-Stage 1 — Trust the evaluation      Stage 2 — Train from trusted traces
-─────────────────────────────       ──────────────────────────────────
-eval_trust: expose contaminated  →  evomerge: convert verified agent
-benchmark claims before they        failures into SFT/DPO/router
-reach the literature                training data
+wasmagent-js  →  bscode  →  evomerge-framework  →  better runtime
+(runtime)        (workload)  (measurement + data)    (fed back)
+```
+
+It has two modules:
+
+1. **`eval_trust`** — benchmark audit: paired statistics, contamination checks, T0v2 triage.
+   Companion to *"Silent Contamination in LLM Merging Evaluation"* ([paper](papers/eval_trust/draft.pdf)).
+2. **`evomerge`** — trace-to-training pipeline: `ComplianceEvalRecord` → SFT / DPO / router records.
 ```
 
 ---
