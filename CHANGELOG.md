@@ -6,6 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased] — 2026-06-25
 
+### Added (Day 31-60)
+
+- **`evomerge/benchmarks/bfcl.py`** — BFCL v4 adapter. `BFCLTask` / `BFCLFunction` / `BFCLResult` /
+  `BFCLFunctionCall` dataclasses. `bfcl_to_rollout()` converts to `rollout-wire/v1`. `BFCLAdapter`
+  with `load_jsonl()` / `to_rollouts()`. CLI: `python -m evomerge import-bfcl --input FILE --output FILE`.
+
+- **`evomerge/benchmarks/mcp_atlas.py`** — MCP-Atlas adapter. `MCPAtlasTask` / `MCPAtlasClaim` /
+  `MCPAtlasResult` / `MCPAtlasToolCall` dataclasses. `mcp_atlas_to_aep()` → `aep/v0.1` record.
+  `mcp_atlas_to_rollout()` → `rollout-wire/v1`. `MCPAtlasAdapter` with `load_jsonl()` / `to_aep()` /
+  `to_rollouts()`. CLI: `python -m evomerge import-mcp-atlas --input FILE --output FILE --format [rollout|aep]`.
+
+- **`evomerge/provenance.py`** — Run provenance / SCITT-style receipt. `RunReceiptBuilder` fluent API
+  (`add_input`, `add_output`, `add_model`, `set_policy_bundle`, `build`). `RunReceipt` with `save()`,
+  `load()`, `receipt_digest` (SHA-256 of canonical JSON). Captures git HEAD, evomerge version, file digests.
+  5 tests pass. CLI: `python -m evomerge receipt --run-id ID [--input F]+ [--output F]+ [--save PATH]`.
+
+- **`evomerge/dataset_card.py` — `TraceCard`**. `TraceCard` dataclass with AEP schema version,
+  run receipt path, known biases, contamination risks, excluded fields. `generate_trace_card()` renders
+  structured TRACE_CARD.md. 2 tests pass (`tests/test_trace_card.py`).
+
 ### Added (P0 AEP reform)
 
 - **`schemas/aep-record.schema.json`** — JSON Schema draft-07 for `AEPRecord` (`aep/v0.1`).
