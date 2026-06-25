@@ -14,11 +14,10 @@ from evomerge.router.features import RouterFeatures, feature_from_record
 from evomerge.router.labels import (
     RouterLabel,
     RouterRecord,
-    build_router_records,
 )
 from evomerge.schemas.training import Provenance
 from evomerge.synthesize.templates import TaskType, make_task_spec
-from evomerge.export import run_export, ExportManifest
+from evomerge.export import run_export
 
 
 def _features() -> RouterFeatures:

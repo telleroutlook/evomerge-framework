@@ -82,7 +82,7 @@ def main() -> int:
 
     from evomerge.synthesize.templates import builtin_templates
     from evomerge.synthesize.generator import (
-        GenerationConfig, _good_prompt, _bad_prompt, _repair_prompt
+        _good_prompt, _bad_prompt, _repair_prompt
     )
     from evomerge.schemas.training import (
         DpoTrainingRecord, Message, Provenance, SftTrainingRecord

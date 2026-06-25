@@ -213,15 +213,15 @@ def main() -> int:
     report_path.write_text(json.dumps(result, indent=2, ensure_ascii=False))
     print(f"  saved report → {report_path}")
 
-    print(f"\nPre-run router (TaskSpec-only) results:")
+    print("\nPre-run router (TaskSpec-only) results:")
     print(f"  CV accuracy : {result['cv_accuracy_mean']:.4f} ± {result['cv_accuracy_std']:.4f}")
     print(f"  CV F1 macro : {result['cv_f1_macro_mean']:.4f} ± {result['cv_f1_macro_std']:.4f}")
-    print(f"\nPost-attempt router (violation features) reference:")
-    print(f"  CV accuracy : 0.9267 ± 0.0249")
-    print(f"  CV F1 macro : 0.8589 ± 0.0531")
+    print("\nPost-attempt router (violation features) reference:")
+    print("  CV accuracy : 0.9267 ± 0.0249")
+    print("  CV F1 macro : 0.8589 ± 0.0531")
     acc_delta = result["cv_accuracy_mean"] - 0.9267
     f1_delta = result["cv_f1_macro_mean"] - 0.8589
-    print(f"\nDelta (pre-run vs post-attempt):")
+    print("\nDelta (pre-run vs post-attempt):")
     print(f"  accuracy : {acc_delta:+.4f}")
     print(f"  F1 macro : {f1_delta:+.4f}")
 

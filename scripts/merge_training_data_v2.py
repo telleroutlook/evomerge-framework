@@ -149,7 +149,7 @@ def main() -> int:
     }
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2))
 
-    print(f"\n✓ v2 training data merged:")
+    print("\n✓ v2 training data merged:")
     print(f"  SFT: {len(all_sft)} records → {sft_path}")
     print(f"  DPO: {len(all_dpo)} pairs  → {dpo_path}")
     print(f"  output_types: {output_types}")

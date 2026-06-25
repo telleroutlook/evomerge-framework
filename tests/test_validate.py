@@ -1,7 +1,6 @@
 """Tests for evomerge.validate (contamination + schema_check)."""
 from __future__ import annotations
 
-import pytest
 
 from evomerge.validate.contamination import check_contamination
 from evomerge.validate.schema_check import validate_training_record

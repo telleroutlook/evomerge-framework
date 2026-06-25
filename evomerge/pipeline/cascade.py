@@ -44,7 +44,6 @@ from dataclasses import dataclass, field
 from typing import Callable
 
 from evomerge.router.classifier import RouterConfig, RouterRuleClassifier
-from evomerge.router.features import RouterFeatures
 from evomerge.router.labels import RouterLabel
 from evomerge.schemas.compliance import TaskSpec
 
@@ -148,7 +147,6 @@ class CascadeRunner:
             CascadeOutcome with the final artifact and metadata.
         """
         from evomerge.router.features import feature_from_record
-        from evomerge.eval.metrics import EvalRecord
 
         effective_spec = spec or self.spec
 

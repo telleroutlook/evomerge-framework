@@ -11,7 +11,7 @@ from collections import defaultdict
 from typing import Sequence
 
 from evomerge.schemas.rollout import RolloutBranchRecord
-from evomerge.schemas.training import DpoTrainingRecord, Message, Provenance, SftTrainingRecord
+from evomerge.schemas.training import DpoTrainingRecord, Provenance
 from evomerge.pipeline.sft import _build_messages, _task_hash
 
 

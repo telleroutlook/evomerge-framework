@@ -6,7 +6,7 @@ Demonstrates the simplest evomerge pipeline step:
 Run:
     python examples/recipe11_rollout_to_sft.py
 """
-from evomerge.io import load_rollouts, write_jsonl
+from evomerge.io import load_rollouts
 from evomerge.pipeline.sft import to_sft_records
 
 # Use the shared fixture so the example always works without external data

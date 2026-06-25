@@ -115,7 +115,7 @@ def _cmd_synthesize(args: argparse.Namespace) -> int:
 
     from evomerge.synthesize.generator import GenerationConfig, SyntheticGenerator
     from evomerge.synthesize.templates import builtin_templates, make_task_spec, TaskType
-    from evomerge.io import write_jsonl, write_dicts_jsonl
+    from evomerge.io import write_jsonl
 
     client = anthropic.Anthropic()
     model = args.model

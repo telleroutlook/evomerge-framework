@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from evomerge.eval.metrics import EvalMetrics, EvalRecord, compute_metrics
-from evomerge.eval.harness import EvalConfig, EvalGroup, EvalHarness, EvalReport
+from evomerge.eval.metrics import EvalRecord, compute_metrics
+from evomerge.eval.harness import EvalConfig, EvalGroup, EvalHarness
 
 
 def _rec(group="A", final_pass=True, tool_calls=2, valid_calls=2,

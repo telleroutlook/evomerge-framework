@@ -220,7 +220,7 @@ def main() -> int:
         processing_class=tokenizer,
     )
 
-    print(f"\nDPO training...")
+    print("\nDPO training...")
     print(f"  epochs       : {args.epochs if args.max_steps <= 0 else 'N/A (max_steps)'}")
     print(f"  max_steps    : {args.max_steps}")
     print(f"  beta         : {args.beta}")

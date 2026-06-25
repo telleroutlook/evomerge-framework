@@ -25,17 +25,13 @@ Typical usage:
 """
 from __future__ import annotations
 
-import json
 import random
 from dataclasses import dataclass, field
-from typing import Any, Callable, Sequence
+from typing import Callable, Sequence
 
 from evomerge.schemas.compliance import (
     ComplianceEvalRecord,
-    ConstraintViolation,
-    RunMode,
     TaskSpec,
-    TokenCost,
 )
 from evomerge.schemas.training import (
     DpoTrainingRecord,
@@ -254,7 +250,6 @@ class SyntheticGenerator:
         This is useful when you have real run data but want to fill gaps
         with synthetic repairs for failed records.
         """
-        from evomerge.pipeline.compliance_sft import compliance_to_sft_records
 
         base = compliance_to_sft_records(records)
         augmented: list[SftTrainingRecord] = list(base)

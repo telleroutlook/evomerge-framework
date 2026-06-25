@@ -95,7 +95,7 @@ def main() -> int:
         return 1
 
     from evomerge.synthesize.generator import GenerationConfig, SyntheticGenerator
-    from evomerge.synthesize.templates import TaskType, make_task_spec, builtin_templates
+    from evomerge.synthesize.templates import builtin_templates
     from evomerge.validate.contamination import check_contamination
     from evomerge.io import write_jsonl
 
@@ -111,7 +111,7 @@ def main() -> int:
     templates = builtin_templates()
 
     est_calls = len(templates) * (args.n_per_type + args.n_bad_per_type * 2)
-    print(f"config:")
+    print("config:")
     print(f"  model          : {args.model}")
     print(f"  templates      : {len(templates)} ({list(templates.keys())})")
     print(f"  n_per_type     : {args.n_per_type}")

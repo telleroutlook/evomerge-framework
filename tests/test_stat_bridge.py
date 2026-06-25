@@ -4,7 +4,7 @@ from __future__ import annotations
 import pytest
 
 from evomerge.eval.metrics import EvalRecord
-from evomerge.eval.stat_bridge import SignificanceReport, compare_all_groups, paired_significance
+from evomerge.eval.stat_bridge import compare_all_groups, paired_significance
 
 
 def _rec(task_id: str, group: str, final_pass: bool,

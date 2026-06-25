@@ -165,7 +165,7 @@ def main() -> int:
     # ── check training deps ──────────────────────────────────────────────────
     try:
         import torch
-        from transformers import AutoModelForCausalLM, TrainingArguments
+        from transformers import AutoModelForCausalLM
         from peft import LoraConfig, get_peft_model, TaskType as PeftTaskType
         from trl import SFTTrainer, SFTConfig
     except ImportError as exc:
@@ -268,7 +268,7 @@ def main() -> int:
         resume_from = str(existing_ckpts[-1])
         print(f"\n  resuming from {resume_from}")
 
-    print(f"\ntraining...")
+    print("\ntraining...")
     print(f"  max_steps      : {args.max_steps}")
     print(f"  effective_batch: {args.batch_size * args.grad_accum}")
     print(f"  loss_threshold : {args.loss_threshold}")

@@ -111,7 +111,8 @@ def _run_group_c_inference(
     from evomerge.eval.metrics import EvalRecord
     from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline as hf_pipeline
     from peft import PeftModel
-    import json, time
+    import json
+    import time
 
     # Resolve base model path from adapter_config.json
     adapter_cfg_path = Path(model_path) / "adapter_config.json"
@@ -326,7 +327,7 @@ def main() -> int:
 
     if not training_complete:
         # Fallback: use existing full_pcl records as proxy
-        print(f"  final checkpoint not ready — using runs.jsonl full_pcl as proxy")
+        print("  final checkpoint not ready — using runs.jsonl full_pcl as proxy")
         group_c_records = []
         for tid in held_out_ids:
             run = runs_index.get((tid, "full_pcl"))

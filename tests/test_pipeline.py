@@ -1,7 +1,6 @@
 """Tests for evomerge.pipeline converters."""
 from __future__ import annotations
 
-import pytest
 
 from evomerge.schemas.compliance import (
     ComplianceEvalRecord,

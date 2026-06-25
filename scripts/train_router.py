@@ -338,7 +338,7 @@ def main() -> int:
     report_path.write_text(json.dumps(result, indent=2, ensure_ascii=False))
     print(f"  saved report → {report_path}")
 
-    print(f"\n✓ Router GBDT trained")
+    print("\n✓ Router GBDT trained")
     print(f"  CV accuracy : {result['cv_accuracy_mean']:.4f} ± {result['cv_accuracy_std']:.4f}")
     print(f"  CV F1 macro : {result['cv_f1_macro_mean']:.4f} ± {result['cv_f1_macro_std']:.4f}")
     return 0

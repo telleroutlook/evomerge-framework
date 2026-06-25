@@ -1,11 +1,9 @@
 """Tests for evomerge.validate.quality_gate."""
 from __future__ import annotations
 
-import pytest
 
 from evomerge.schemas.training import DpoTrainingRecord, Message, Provenance, SftTrainingRecord
 from evomerge.validate.quality_gate import (
-    QualityReport,
     check_dpo_quality,
     check_sft_quality,
     run_quality_gate,

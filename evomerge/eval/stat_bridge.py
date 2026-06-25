@@ -21,7 +21,6 @@ Typical usage (proving C > A is statistically significant):
 """
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass, field
 
 from evomerge.eval.metrics import EvalRecord

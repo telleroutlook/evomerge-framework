@@ -1,7 +1,6 @@
 """Tests for compliance_to_dpo_records and cascade."""
 from __future__ import annotations
 
-import pytest
 
 from evomerge.schemas.compliance import (
     ComplianceEvalRecord,
@@ -252,11 +251,11 @@ class TestCascadeRunner:
 
 class TestTopLevelImports:
     def test_router_imports_from_top_level(self):
-        from evomerge import RouterLabel, RouterFeatures, RouterRuleClassifier
+        from evomerge import RouterLabel
         assert RouterLabel.small_model_can_handle
 
     def test_eval_imports_from_top_level(self):
-        from evomerge import EvalHarness, EvalRecord, paired_significance
+        from evomerge import EvalHarness
         assert EvalHarness is not None
 
     def test_compliance_dpo_importable(self):
@@ -264,5 +263,5 @@ class TestTopLevelImports:
         assert callable(compliance_to_dpo_records)
 
     def test_cascade_importable(self):
-        from evomerge.pipeline import CascadeRunner, CascadeConfig
+        from evomerge.pipeline import CascadeRunner
         assert CascadeRunner is not None

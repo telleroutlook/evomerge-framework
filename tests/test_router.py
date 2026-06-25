@@ -1,7 +1,6 @@
 """Tests for evomerge.router (features, labels, classifier)."""
 from __future__ import annotations
 
-import pytest
 
 from evomerge.eval.metrics import EvalRecord
 from evomerge.router.features import RouterFeatures, feature_from_record
@@ -12,7 +11,7 @@ from evomerge.router.labels import (
     label_from_record,
 )
 from evomerge.router.classifier import RouterConfig, RouterRuleClassifier
-from evomerge.schemas.compliance import TaskSpec, ToolPolicy
+from evomerge.schemas.compliance import TaskSpec
 from evomerge.schemas.training import Provenance
 from evomerge.synthesize.templates import TaskType, make_task_spec
 

@@ -1,9 +1,7 @@
 """Tests for evomerge.schemas — round-trip serialisation."""
 from __future__ import annotations
 
-import json
 
-import pytest
 
 from evomerge.schemas.rollout import BuildResult, RolloutBranchRecord, ToolCallEntry
 from evomerge.schemas.compliance import (
@@ -15,7 +13,6 @@ from evomerge.schemas.compliance import (
     RepairStrategy,
     RunMode,
     TaskSpec,
-    TokenCost,
     ViolationStage,
 )
 from evomerge.schemas.training import (

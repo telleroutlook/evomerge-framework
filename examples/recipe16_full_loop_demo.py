@@ -18,7 +18,6 @@ from __future__ import annotations
 
 import json
 import tempfile
-from pathlib import Path
 
 # ── 1. Export training data from the shared fixture ──────────────────────────
 print("=" * 60)
@@ -133,7 +132,6 @@ print("=" * 60)
 
 from evomerge.router.classifier import RouterRuleClassifier
 from evomerge.router.features import feature_from_record
-from evomerge.router.labels import RouterLabel, label_from_record
 from evomerge.synthesize.templates import TaskType, make_task_spec
 
 spec = make_task_spec(TaskType.markdown_report, intent="Summarise document")

@@ -63,7 +63,7 @@ def check_jsonschema(samples: list[dict], wasmagent_js: Path) -> tuple[int, list
         print(f"[skip] wasmagent-js schema not found: {schema_path}", file=sys.stderr)
         return 0, []
     try:
-        import jsonschema  # type: ignore[import-not-found]
+        import jsonschema  # type: ignore[import-not-found]  # noqa: F401
     except ImportError:
         print("[skip] jsonschema not installed — pip install jsonschema", file=sys.stderr)
         return 0, []

@@ -1,19 +1,15 @@
 """Tests for cross_mode_dpo_records."""
 from __future__ import annotations
 
-import pytest
 
 from evomerge.schemas.compliance import (
     ComplianceEvalRecord,
     ConstraintCategory,
     ConstraintLevel,
     ConstraintViolation,
-    RepairStrategy,
-    RepairTraceEntry,
     RunMode,
     ViolationStage,
 )
-from evomerge.schemas.training import DpoTrainingRecord
 from evomerge.pipeline.cross_mode_dpo import cross_mode_dpo_records, cross_mode_summary
 
 
