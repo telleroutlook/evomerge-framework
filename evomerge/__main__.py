@@ -10,6 +10,9 @@ Commands:
   validate        Run contamination and schema checks on training JSONL
   validate-aep    Validate AEP (Agent Evidence Protocol) records
   lint-benchmark  Check a benchmark task dir for anti-reward-hacking exploit surfaces
+  receipt         Produce a run provenance receipt (RunReceipt JSON)
+  import-bfcl     Convert BFCL v4 results JSONL to rollout-wire/v1 JSONL
+  import-mcp-atlas Convert MCP-Atlas results JSONL to rollout-wire/v1 or AEP JSONL
 
 Run `python -m evomerge <command> --help` for per-command options.
 """
@@ -361,6 +364,100 @@ def _cmd_lint_benchmark(args: argparse.Namespace) -> int:
 
 
 # ---------------------------------------------------------------------------
+# import-bfcl
+# ---------------------------------------------------------------------------
+
+def _cmd_import_bfcl(args: argparse.Namespace) -> int:
+    """Convert BFCL v4 results JSONL to rollout-wire/v1 JSONL."""
+    from evomerge.benchmarks.bfcl import BFCLAdapter
+
+    if not args.input:
+        print("[error] --input is required", file=sys.stderr)
+        return 1
+    if not args.output:
+        print("[error] --output is required", file=sys.stderr)
+        return 1
+
+    adapter = BFCLAdapter()
+    pairs = adapter.load_jsonl(args.input)
+    rollouts = adapter.to_rollouts(pairs)
+
+    out_path = Path(args.output)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(out_path, "w") as fh:
+        for record in rollouts:
+            fh.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+    print(f"[ok] wrote {len(rollouts)} rollout-wire/v1 records to {out_path}")
+    return 0
+
+
+# ---------------------------------------------------------------------------
+# import-mcp-atlas
+# ---------------------------------------------------------------------------
+
+def _cmd_import_mcp_atlas(args: argparse.Namespace) -> int:
+    """Convert MCP-Atlas results JSONL to rollout-wire/v1 or AEP JSONL."""
+    from evomerge.benchmarks.mcp_atlas import MCPAtlasAdapter
+
+    if not args.input:
+        print("[error] --input is required", file=sys.stderr)
+        return 1
+    if not args.output:
+        print("[error] --output is required", file=sys.stderr)
+        return 1
+
+    adapter = MCPAtlasAdapter()
+    pairs = adapter.load_jsonl(args.input)
+
+    fmt = args.format or "rollout"
+    if fmt == "aep":
+        records = adapter.to_aep(pairs)
+    else:
+        records = adapter.to_rollouts(pairs)
+
+    out_path = Path(args.output)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(out_path, "w") as fh:
+        for record in records:
+            fh.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+    print(f"[ok] wrote {len(records)} {fmt} records to {out_path}")
+    return 0
+
+
+# ---------------------------------------------------------------------------
+# receipt
+# ---------------------------------------------------------------------------
+
+def _cmd_receipt(args: argparse.Namespace) -> int:
+    from evomerge.provenance import RunReceiptBuilder
+
+    if not args.run_id:
+        print("[error] --run-id is required", file=sys.stderr)
+        return 1
+
+    builder = RunReceiptBuilder(run_id=args.run_id, operator=args.operator)
+
+    for path in args.input or []:
+        builder.add_input(path)
+    for path in args.output or []:
+        builder.add_output(path)
+    for model in args.model or []:
+        builder.add_model(model)
+
+    receipt = builder.build()
+
+    if args.save:
+        receipt.save(Path(args.save))
+        print(f"[ok] receipt saved to {args.save}")
+    else:
+        print(json.dumps(receipt.to_dict(), indent=2, ensure_ascii=False))
+
+    return 0
+
+
+# ---------------------------------------------------------------------------
 # argument parser
 # ---------------------------------------------------------------------------
 
@@ -456,6 +553,39 @@ def _build_parser() -> argparse.ArgumentParser:
     lb.add_argument("--fail-under", type=float, default=0.6, metavar="F",
                     help="minimum trust score (0.0–1.0) required for exit 0 (default: 0.6)")
 
+    # --- import-bfcl ---
+    bfcl_p = sub.add_parser("import-bfcl",
+                            help="convert BFCL v4 results JSONL to rollout-wire/v1 JSONL")
+    bfcl_p.add_argument("--input", metavar="FILE", required=True,
+                        help="BFCL results JSONL (each line: task+result fields merged)")
+    bfcl_p.add_argument("--output", metavar="FILE", required=True,
+                        help="output rollout-wire/v1 JSONL path")
+
+    # --- import-mcp-atlas ---
+    mcp_p = sub.add_parser("import-mcp-atlas",
+                           help="convert MCP-Atlas results JSONL to rollout-wire/v1 or AEP JSONL")
+    mcp_p.add_argument("--input", metavar="FILE", required=True,
+                       help="MCP-Atlas results JSONL (each line: task+result fields merged)")
+    mcp_p.add_argument("--output", metavar="FILE", required=True,
+                       help="output JSONL path")
+    mcp_p.add_argument("--format", choices=["rollout", "aep"], default="rollout",
+                       help="output format: rollout-wire/v1 or AEP (default: rollout)")
+
+    # --- receipt ---
+    rcp = sub.add_parser("receipt", help="produce a run provenance receipt (RunReceipt JSON)")
+    rcp.add_argument("--run-id", metavar="STRING", required=True,
+                     help="unique identifier for this pipeline run")
+    rcp.add_argument("--input", metavar="FILE", action="append",
+                     help="input file to record (repeatable)")
+    rcp.add_argument("--output", metavar="FILE", action="append",
+                     help="output file to record (repeatable)")
+    rcp.add_argument("--model", metavar="STRING", action="append",
+                     help="model ID used in the run (repeatable)")
+    rcp.add_argument("--operator", metavar="STRING", default="ci",
+                     help="operator identifier (default: ci)")
+    rcp.add_argument("--save", metavar="PATH",
+                     help="save receipt to this path instead of printing to stdout")
+
     return p
 
 
@@ -477,6 +607,9 @@ def main(argv: list[str] | None = None) -> int:
         "validate": _cmd_validate,
         "validate-aep": _cmd_validate_aep,
         "lint-benchmark": _cmd_lint_benchmark,
+        "receipt": _cmd_receipt,
+        "import-bfcl": _cmd_import_bfcl,
+        "import-mcp-atlas": _cmd_import_mcp_atlas,
     }
     return dispatch[args.command](args)
 

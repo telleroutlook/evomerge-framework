@@ -7,6 +7,7 @@ This module contains the core generation logic shared between:
 from __future__ import annotations
 
 import time
+from dataclasses import dataclass, field
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).parent.parent
@@ -111,4 +112,90 @@ def generate_dataset_card(manifest: dict, *, name: str, date: str = "") -> str:
     return card
 
 
-__all__ = ["generate_dataset_card"]
+__all__ = ["generate_dataset_card", "TraceCard", "generate_trace_card"]
+
+
+# ── Trace Card ────────────────────────────────────────────────────────────────
+
+@dataclass
+class TraceCard:
+    """Structured metadata card for a trace dataset.
+
+    Matches the P1-4 TraceCard schema from the reform roadmap.
+    """
+    dataset_name: str
+    source_repo: str
+    source_commit: str
+    collection_mode: str              # "demo" | "evidence" | "training"
+    data_subject_risk: str            # "low" | "medium" | "high"
+    pii_redaction_profile: str
+    license: str
+    consent_basis: str
+    model_provider: str
+    model_id: str
+    policy_bundle: str
+    verifier_bundle: str
+    known_biases: list[str] = field(default_factory=list)
+    known_contamination_risks: list[str] = field(default_factory=list)
+    excluded_fields: list[str] = field(default_factory=list)
+    replay_command: str = ""
+    aep_schema_version: str = "aep/v0.1"
+    run_receipt_path: str = ""
+
+
+def generate_trace_card(card: TraceCard, *, date: str = "") -> str:
+    """Render a TRACE_CARD.md string from a TraceCard."""
+    import time
+    if not date:
+        date = time.strftime("%Y-%m-%d")
+
+    biases = "\n".join(f"- {b}" for b in card.known_biases) or "- None reported"
+    contamination = "\n".join(f"- {c}" for c in card.known_contamination_risks) or "- None reported"
+    excluded = ", ".join(card.excluded_fields) or "none"
+
+    return f"""# Trace Card — {card.dataset_name}
+
+> Generated {date}
+
+## Collection
+
+| Field | Value |
+|---|---|
+| Source repo | {card.source_repo} |
+| Source commit | {card.source_commit} |
+| Collection mode | {card.collection_mode} |
+| Data subject risk | {card.data_subject_risk} |
+| PII redaction profile | {card.pii_redaction_profile} |
+| Consent basis | {card.consent_basis} |
+
+## Model & Policy
+
+| Field | Value |
+|---|---|
+| Model provider | {card.model_provider} |
+| Model ID | {card.model_id} |
+| Policy bundle | {card.policy_bundle} |
+| Verifier bundle | {card.verifier_bundle} |
+| AEP schema version | {card.aep_schema_version} |
+
+## Provenance
+
+- Run receipt: {card.run_receipt_path or "not generated"}
+- Replay: `{card.replay_command}`
+
+## License
+
+{card.license} · {card.consent_basis}
+
+## Known biases
+
+{biases}
+
+## Known contamination risks
+
+{contamination}
+
+## Excluded fields
+
+{excluded}
+"""
