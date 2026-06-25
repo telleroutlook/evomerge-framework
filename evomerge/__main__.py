@@ -3,6 +3,7 @@
 Commands:
   export      Convert rollout / compliance traces to training JSONL
   adp-export  Convert rollout-wire/v1 to ADP (Agent Data Protocol) JSONL
+  rl-export   Convert rollout-wire/v1 to RL transition records JSONL
   router      Predict routing labels for a batch of router records
   synthesize  Generate synthetic SFT/DPO samples via a teacher model
   validate    Run contamination and schema checks on training JSONL
@@ -65,6 +66,26 @@ def _cmd_adp_export(args: argparse.Namespace) -> int:
             print(json.dumps(dataclasses.asdict(step), ensure_ascii=False))
     else:
         print(f"[ok] wrote {len(steps)} ADP steps to {out}")
+    return 0
+
+
+# ---------------------------------------------------------------------------
+# rl-export
+# ---------------------------------------------------------------------------
+
+def _cmd_rl_export(args: argparse.Namespace) -> int:
+    from evomerge.rl.export import rollout_file_to_rl_transitions
+    import dataclasses
+
+    dims = [d.strip() for d in args.reward.split(",") if d.strip()] if args.reward else None
+    out = args.out or None
+    transitions = rollout_file_to_rl_transitions(args.rollout, reward_dims=dims, out=out)
+    if out is None:
+        import json
+        for t in transitions:
+            print(json.dumps(dataclasses.asdict(t), ensure_ascii=False))
+    else:
+        print(f"[ok] wrote {len(transitions)} RL transitions to {out}")
     return 0
 
 
@@ -319,6 +340,15 @@ def _build_parser() -> argparse.ArgumentParser:
     adp.add_argument("--out", metavar="FILE",
                      help="output JSONL path (default: stdout)")
 
+    # --- rl-export ---
+    rl = sub.add_parser("rl-export", help="convert rollout-wire/v1 to RL transition JSONL")
+    rl.add_argument("--rollout", metavar="FILE", required=True,
+                    help="rollout-wire/v1 JSONL input")
+    rl.add_argument("--reward", metavar="DIMS", default="build,policy,cost",
+                    help="comma-separated reward dims: build,visual,policy,cost")
+    rl.add_argument("--out", metavar="FILE",
+                    help="output JSONL path (default: stdout)")
+
     return p
 
 
@@ -333,6 +363,7 @@ def main(argv: list[str] | None = None) -> int:
     dispatch = {
         "export": _cmd_export,
         "adp-export": _cmd_adp_export,
+        "rl-export": _cmd_rl_export,
         "router": _cmd_router,
         "synthesize": _cmd_synthesize,
         "validate": _cmd_validate,
