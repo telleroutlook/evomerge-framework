@@ -4,6 +4,47 @@ All notable changes to this repository.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased] — 2026-06-25
+
+### Added
+
+- `fixtures/golden/` — 6 golden trace fixtures covering all canonical scenarios:
+  `rollout-success`, `rollout-policy-blocked`, `rollout-repair-success`,
+  `compliance-direct-pass`, `compliance-direct-fail`, `compliance-repair-pass`.
+- `fixtures/fixtures.lock.json` — SHA-256 hash lock for all 7 fixtures (6 golden + 1 shared data-loop).
+- `scripts/verify-fixtures-lock.py` — standalone fixture hash verifier usable by any repo's CI.
+- `docs/ecosystem-map.md` — canonical three-repo system diagram and terminology guide.
+- CI fixture hash check step using `verify-fixtures-lock.py`.
+- SFT-v2/v3 training pipeline:
+  - `scripts/generate_synthetic_data_fast.py` — parallel Anthropic API synthetic data generation
+    with retry on rate limits (local proxy support).
+  - `scripts/merge_training_data_v2.py` — merge all training sources with full-content dedup;
+    auto-imports new IFEval seeds from wasmagent-js.
+  - `scripts/train_dpo.py` — DPO/ORPO fine-tuning with TRL DPOTrainer; `--merge-all` flag;
+    `--force-cpu` for Apple Silicon; auto-detects LoRA vs full model checkpoint.
+  - `scripts/train_sft.py` updated: auto-detects latest checkpoint for resume;
+    `--force-cpu` flag (Apple Silicon only; Linux CPU does not need it).
+  - `scripts/compare_base_vs_sft.py` — 3-seed A vs C comparison with McNemar + bootstrap.
+  - `scripts/eval_group_ac.py` — live eval via compliance engine GGUF inference.
+  - `checkpoints/base/Qwen2.5-1.5B-Instruct/` — canonical base model (hf-mirror download).
+- v2 training data pipeline:
+  - 1220 SFT records + 142 DPO pairs from 9 IFEval seeds + 2 synthetic batches.
+  - `data/training/ifeval/` — 900 real ComplianceEvalRecords → 556 SFT + 67 repair-DPO + 34 cross-mode DPO.
+  - `data/training/v2/sft_merged.jsonl` and `dpo_merged.jsonl` (gitignored, local only).
+- IFEval benchmark seeds 45–50 in `wasmagent-js/packages/compliance/benchmarks/ifeval/`.
+- SFT-v1 experiment results and analysis (Section 4.4 of compliance model report):
+  - Null result: −4.7 pp (p=0.28) vs base model. Confirmed data scale insufficient without DPO phase.
+  - GGUF Q4_K_M conversion pipeline; `evomerge-sft-compliance-v1` registered in LocalModel registry.
+- README repositioned as "measurement trust + trace-to-training backend".
+
+### Changed
+
+- `scripts/check-schema-fields.py`: fixture hash check now uses `verify-fixtures-lock.py`.
+- `evomerge/schemas/compliance.py`: `ComplianceEvalRecord` now has `schema_version` field
+  (`"compliance-eval-record/v1"`) for cross-repo contract enforcement.
+- `wasmagent-js/packages/model-local/src/registry.ts`: added `evomerge-sft-compliance-v1` entry.
+- `wasmagent-js/packages/compliance/benchmarks/ifeval/run.ts`: supports direct GGUF path in `--model`.
+
 ## [0.2.0] — 2026-06-24
 
 ### Added — `evomerge` pipeline package

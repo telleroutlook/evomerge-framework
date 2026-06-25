@@ -63,22 +63,7 @@ jobs:
 
       - name: Fixture hash check (golden fixtures must not drift)
         run: |
-          python - <<'PY'
-          import hashlib, json, sys
-          lock = json.load(open("fixtures/fixtures.lock.json"))
-          errors = []
-          for e in lock["fixtures"]:
-              try:
-                  actual = hashlib.sha256(open(e["fixture"], "rb").read()).hexdigest()
-                  if actual != e["sha256"]:
-                      errors.append(f"DRIFT: {e['fixture']} expected={e['sha256'][:16]}... got={actual[:16]}...")
-              except FileNotFoundError:
-                  errors.append(f"MISSING: {e['fixture']}")
-          if errors:
-              for err in errors: print(err)
-              sys.exit(1)
-          print(f"✓ {len(lock['fixtures'])} fixture hashes verified")
-          PY
+          python scripts/verify-fixtures-lock.py
 
       - name: Schema drift check (standalone, no wasmagent-js required)
         run: |
