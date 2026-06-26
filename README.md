@@ -258,27 +258,25 @@ evomerge/
 | `python -m evomerge import-agent-harm` | AgentHarm/OS-Harm/CUAHarm → AEP JSONL |
 | `python -m evomerge import-otel` | OTel spans JSONL → AEP JSONL |
 
-### New modules (since v0.2)
+### New modules (2026-06-26)
 
 | Module | Location | Purpose |
 |---|---|---|
+| Evidence Admission Score | `evomerge/validate/quality_gate.py` | 6-dim score → train_sft/dpo/repair/router/audit_only/reject |
+| AEP v0.2 validator | `evomerge/validate/aep.py` | v0.1 + v0.2 schema, causal/taint/scope fields |
+| Standards coverage matrix | `evomerge/audit_report.py` — `_standards_section` | OWASP-MCP / OTel / AEP-Provenance per AEP file |
+| Verifier strength audit | `evomerge/eval/verifier_audit.py` | 5 failure-mode checks (high_pass_rate, oracle_leakage …) |
+| Calibrated trust score | `evomerge/trust_score.py` — `compute_calibrated_trust_score` | evidence_health / policy_risk / training_eligibility |
+| AEP dataset card | `evomerge/dataset_card.py` — `generate_aep_dataset_card` | consent / redaction / admission / contamination sections |
+| Conformal CI | `evomerge/conformal_ci.py` | Wilson CI for benchmark pass-rate reports |
+| BFCL v4 adapter | `evomerge/benchmarks/bfcl.py` | BFCL results → rollout-wire |
+| τ-bench adapter | `evomerge/benchmarks/tau_bench.py` | τ-bench results → rollout-wire |
+| Paper appendix gen | `papers/eval_trust/scripts/generate_appendix.py` | reproducibility table + key results + environment |
 | ADP export | `evomerge/adp/export.py` | rollout → Agent Data Protocol episodes |
 | RL transitions | `evomerge/rl/export.py` | rollout → (state, action, reward, done) tuples |
-| Capability taxonomy | `evomerge/capability/taxonomy.py` | 11-tag deterministic step tagger |
-| Capability attribution | `evomerge/capability/attribution.py` | mine failure modes from pass/fail branch pairs |
-| Trace-to-context | `evomerge/context_compile/compiler.py` | long-context QA + router/critic records |
-| MCP security eval | `evomerge/security/mcp.py` | McpSecurityEvalRecord schema for firewall events |
-| Dataset card | `scripts/generate-dataset-card.py` | auto-generate DATASET_CARD.md from manifest.json |
-| AEP validation | `evomerge/validate/aep.py` | validate AEP records + evidence completeness |
+| MCP security eval | `evomerge/security/mcp.py` | McpSecurityEvalRecord schema |
 | Benchmark linter | `evomerge/security/benchmark_linter.py` | 6-check exploit surface scanner |
-| Run provenance | `evomerge/provenance.py` | SCITT-style RunReceipt + RunReceiptBuilder |
-| Evidence Registry | `evomerge/registry.py` | signed-JSON artifact registry (8 entry types) |
-| Agent Trust Score | `evomerge/trust_score.py` | 9-dim geometric mean trustworthiness score |
-| Audit report | `evomerge/audit_report.py` | AEP + linter + provenance → Markdown report |
-| AEP→router bridge | `evomerge/router/aep_bridge.py` | features_from_aep() + label_from_aep() |
-| Trace Card | `evomerge/dataset_card.py` | TraceCard + generate_trace_card() |
-| Exploit taxonomy | `eval_trust/exploit_surface.py` | 6-surface agent benchmark exploit taxonomy |
-| Benchmark adapters | `evomerge/benchmarks/` | BFCL v4, MCP-Atlas, Terminal-Bench, τ-bench, ToolSandbox, AgentHarm, OAI, LangSmith, MS-AF, ADK, A2A |
+| Run provenance | `evomerge/provenance.py` | SCITT-style RunReceipt |
 
 ### Schema contract
 
@@ -305,9 +303,13 @@ and bscode. Sync all three repos in the same PR when changing.
 |---|---|
 | `examples/recipe11_rollout_to_sft.py` | rollout JSONL → SFT records |
 | `examples/recipe12_rollout_to_dpo.py` | rollout JSONL → DPO preference pairs |
-| `examples/recipe13_compliance_sft.py` | ComplianceEvalRecord → answerer + repairer |
+| `examples/recipe13_compliance_sft.py` | ComplianceEvalRecord → SFT |
 | `examples/recipe14_eval_harness.py` | A/B/C/D/E comparison harness |
-| `examples/recipe15_significance.py` | McNemar + bootstrap: C > A at p < 0.05 |
+| `examples/recipe15_significance.py` | McNemar + bootstrap significance |
+| `examples/recipe16_full_loop_demo.py` | full loop demo |
+| `examples/recipe18_bfcl_import.py` | BFCL v4 → rollout-wire + admission |
+| `examples/recipe19_tau_bench_import.py` | τ-bench → rollout-wire + admission |
+| `examples/recipe20_compliance_training_full.py` | compliance-conditioned SFT+DPO full pipeline |
 
 ---
 
